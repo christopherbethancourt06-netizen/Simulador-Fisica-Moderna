@@ -151,34 +151,34 @@ function updateSimulationLive() {
   simBadge.classList.toggle('active', v > 0);
 
   if (ph === 'contraction') {
-    const target = document.getElementById("target-select").value;
-    const L2_inp = getInputVal('L2');
-    const L1_inp = getInputVal('L1');
-    const sqrtVal = Math.sqrt(1 - v * v);
 
-    if (target === 'L0') { // Calcular Longitud en Reposo (L2)
-      if (isNaN(L1_inp) || L1_inp <= 0) { alert('Ingresa L₁ válido'); return; }
-      const L2_res = L1_inp / sqrtVal;
+  const L2 = getInputVal('L2');
+  const L1 = getInputVal('L1');
+  const v  = currentVelocity;
+  const target = document.getElementById("target-select").value;
 
-      renderProcedure(
-        dataLine('L₁', `${L1_inp} m`) + dataLine('V', `${v}c`),
-        mathFormula(`L_2 = L_1 / \\sqrt{1 - V^2/C^2}`),
-        substStep(`L_2 = ${L1_inp} / \\sqrt{1 - (${v})^2}`) +
-        substStep(`L_2 = ${L1_inp} / ${sqrtVal.toFixed(4)}`),
-        resultHighlight('L₂ (reposo)', `${fmt(L2_res)} m`)
-      );
-    } else if (target === 'v') {
-      // ... (Lógica de velocidad explicada anteriormente)
-    } else { // Calcular L1 (Original)
-      const L1_res = L2_inp * sqrtVal;
-      renderProcedure(
-        dataLine('L₂', `${L2_inp} m`) + dataLine('V', `${v}c`),
-        mathFormula(`L_1 = L_2 \\sqrt{1 - V^2/C^2}`),
-        substStep(`L_1 = ${L2_inp} (${sqrtVal.toFixed(4)})`),
-        resultHighlight('L₁', `${fmt(L1_res)} m`)
-      );
-    }
+  let result;
+
+  if (target === "L") {
+    result = L2 * Math.sqrt(1 - v*v);
   }
+
+  if (target === "L0") {
+    result = L1 / Math.sqrt(1 - v*v);
+  }
+
+  if (target === "v") {
+    result = Math.sqrt(1 - (L1/L2)**2);
+    setVelocity(result);
+  }
+
+  renderProcedure(
+    dataLine('Datos', `Lâ‚‚=${L2}, Lâ‚=${L1}, v=${v}`),
+    mathFormula(`Lâ‚ = Lâ‚‚ âˆš(1 âˆ’ vÂ²/cÂ²)`),
+    substStep(`Resultado calculado automÃ¡ticamente`),
+    resultHighlight('Resultado', fmt(result))
+  );
+}
 
   if (ph === 'dilation') {
     dilatedFactor = g;
