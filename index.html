@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatividad Especial — Simulador</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="brand-dot"></div>
+        <span class="brand-name">Relatividad Especial</span>
+      </div>
+      <span class="header-subtitle">Simulador de Física Relativista</span>
+    </div>
+  </header>
+
+  <main class="app-layout">
+
+    <!-- PANEL IZQUIERDO: CONTROL -->
+    <section class="card card-control" id="card-control">
+      <div class="card-header">
+        <span class="card-label">01</span>
+        <h2 class="card-title">Datos del problema</h2>
+      </div>
+
+      <div class="control-group">
+        <label class="input-label" for="phenomenon-select">Fenómeno</label>
+        <div class="select-wrapper">
+          <select id="phenomenon-select">
+            <option value="contraction">Contracción de la Longitud</option>
+            <option value="dilation">Dilatación del Tiempo</option>
+            <option value="mass">Varianza de la Masa</option>
+            <option value="velocity">Suma de Velocidades Relativistas</option>
+          </select>
+          <svg class="select-arrow" viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="control-group">
+  <label class="input-label">¿Qué quieres calcular?</label>
+  <div class="select-wrapper">
+    <select id="target-select">
+      <option value="L">L (longitud en movimiento)</option>
+      <option value="L0">L₀ (longitud en reposo)</option>
+      <option value="v">v (velocidad)</option>
+      <option value="T">T (tiempo dilatado)</option>
+      <option value="T0">T₀ (tiempo propio)</option>
+      <option value="m">m (masa relativista)</option>
+      <option value="m0">m₀ (masa en reposo)</option>
+    </select>
+  </div>
+</div>
+
+      <!-- Inputs dinámicos -->
+      <div id="dynamic-inputs" class="dynamic-inputs"></div>
+
+      <!-- Slider de velocidad -->
+      <div class="control-group slider-group">
+        <div class="slider-header">
+          <label class="input-label">Velocidad relativa</label>
+          <span class="slider-value" id="velocity-display">0.00 c</span>
+        </div>
+        <div class="slider-track-wrap">
+          <input type="range" id="velocity-slider" min="0" max="99" step="1" value="0" />
+          <div class="slider-fill" id="slider-fill"></div>
+        </div>
+        <div class="slider-marks">
+          <span>0</span>
+          <span>0.25 c</span>
+          <span>0.50 c</span>
+          <span>0.75 c</span>
+          <span>0.99 c</span>
+        </div>
+      </div>
+
+      <!-- Lorentz factor display -->
+      <div class="lorentz-display" id="lorentz-display">
+        <span class="lorentz-label">Factor Lorentz γ</span>
+        <span class="lorentz-value" id="lorentz-value">1.000</span>
+      </div>
+
+      <button class="btn-calculate" id="btn-calculate">
+        <span class="btn-text">Calcular</span>
+        <svg class="btn-icon" viewBox="0 0 20 20" fill="none">
+          <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </section>
+
+    <!-- PANEL CENTRAL: SIMULACIÓN -->
+    <section class="card card-simulation" id="card-simulation">
+      <div class="card-header">
+        <span class="card-label">02</span>
+        <h2 class="card-title">Simulación</h2>
+        <span class="sim-badge" id="sim-badge">En reposo</span>
+      </div>
+
+      <div class="sim-viewport" id="sim-viewport">
+        <!-- Canvas de simulación contracción -->
+        <div class="sim-scene" id="scene-contraction">
+          <div class="scene-row reference-frame">
+            <span class="frame-label">Marco en reposo</span>
+            <div class="sim-ruler">
+              <div class="sim-bar rest-bar" id="bar-rest">
+                <span class="bar-label">L₀</span>
+              </div>
+            </div>
+          </div>
+          <div class="scene-row moving-frame">
+            <span class="frame-label">Marco en movimiento</span>
+            <div class="sim-ruler">
+              <div class="sim-bar moving-bar" id="bar-moving">
+                <span class="bar-label" id="bar-moving-label">L₁</span>
+              </div>
+            </div>
+          </div>
+          <div class="velocity-arrow-wrap">
+            <div class="velocity-arrow" id="velocity-arrow">
+              <div class="arrow-line"></div>
+              <div class="arrow-head"></div>
+              <span class="arrow-label" id="arrow-label">v = 0.00 c</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canvas dilatación de tiempo -->
+        <div class="sim-scene hidden" id="scene-dilation">
+          <div class="clocks-container">
+            <div class="clock-unit">
+              <div class="clock-face" id="clock-rest">
+                <div class="clock-center"></div>
+                <div class="clock-hand second-hand" id="hand-rest"></div>
+                <div class="tick-marks"></div>
+              </div>
+              <span class="clock-label">τ propio</span>
+              <span class="clock-sublabel">Marco en reposo</span>
+            </div>
+            <div class="clock-divider">
+              <span>≠</span>
+            </div>
+            <div class="clock-unit">
+              <div class="clock-face" id="clock-moving">
+                <div class="clock-center"></div>
+                <div class="clock-hand second-hand dilated" id="hand-moving"></div>
+              </div>
+              <span class="clock-label">T dilatado</span>
+              <span class="clock-sublabel">Marco en movimiento</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canvas masa -->
+        <div class="sim-scene hidden" id="scene-mass">
+          <div class="mass-container">
+            <div class="mass-unit">
+              <div class="mass-circle-wrap">
+                <div class="mass-circle rest-mass" id="mass-rest-circle">
+                  <span class="mass-circle-label">m₀</span>
+                </div>
+              </div>
+              <span class="mass-label">Masa en reposo</span>
+            </div>
+            <div class="mass-arrow">→</div>
+            <div class="mass-unit">
+              <div class="mass-circle-wrap">
+                <div class="mass-circle rel-mass" id="mass-rel-circle">
+                  <span class="mass-circle-label">m₁</span>
+                </div>
+              </div>
+              <span class="mass-label">Masa relativista</span>
+            </div>
+          </div>
+          <div class="mass-bar-container">
+            <div class="mass-bar-track">
+              <div class="mass-bar-fill" id="mass-bar-fill"></div>
+            </div>
+            <div class="mass-bar-labels">
+              <span>m₀</span>
+              <span id="mass-multiplier">× 1.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canvas suma de velocidades -->
+        <div class="sim-scene hidden" id="scene-velocity">
+          <div class="velocity-track">
+            <div class="track-line">
+              <div class="observer-dot" id="observer-dot">
+                <span class="dot-label">Ref.</span>
+              </div>
+              <div class="obj1-dot" id="obj1-dot">
+                <span class="dot-label">v₁</span>
+              </div>
+              <div class="obj-result-dot" id="result-dot">
+                <span class="dot-label">V</span>
+              </div>
+            </div>
+          </div>
+          <div class="velocity-scale">
+            <span>0</span><span>0.5c</span><span>c</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-info">
+        <span class="sim-info-text" id="sim-info-text">Ajusta los parámetros y presiona Calcular</span>
+      </div>
+    </section>
+
+    <!-- PANEL DERECHO: PROCEDIMIENTO -->
+    <section class="card card-procedure" id="card-procedure">
+      <div class="card-header">
+        <span class="card-label">03</span>
+        <h2 class="card-title">Procedimiento</h2>
+      </div>
+
+      <div class="procedure-content" id="procedure-content">
+        <div class="procedure-empty" id="procedure-empty">
+          <div class="empty-icon">
+            <svg viewBox="0 0 40 40" fill="none">
+              <rect x="8" y="8" width="24" height="24" rx="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M14 16h12M14 20h8M14 24h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p>El procedimiento aparecerá<br/>al presionar Calcular</p>
+        </div>
+
+        <div class="procedure-result hidden" id="procedure-result">
+          <div class="proc-section" id="proc-datos">
+            <span class="proc-section-title">Datos</span>
+            <div class="proc-body" id="body-datos"></div>
+          </div>
+          <div class="proc-divider"></div>
+          <div class="proc-section" id="proc-formulas">
+            <span class="proc-section-title">Fórmulas</span>
+            <div class="proc-body" id="body-formulas"></div>
+          </div>
+          <div class="proc-divider"></div>
+          <div class="proc-section" id="proc-sust">
+            <span class="proc-section-title">Sustituciones</span>
+            <div class="proc-body" id="body-sust"></div>
+          </div>
+          <div class="proc-divider"></div>
+          <div class="proc-section" id="proc-result">
+            <span class="proc-section-title">Resultados</span>
+            <div class="proc-body" id="body-result"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
